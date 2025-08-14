@@ -6,8 +6,8 @@ namespace EFModeling.EntityProperties.FluentAPI.Required;
 
 public class BackendDbContext : DbContext
 {
-    public DbSet<Transaction> TransactionSet { get; set; }
-    public DbSet<Account> AccountSet { get; set; }
+    public DbSet<Transaction> Transaction { get; set; }
+    public DbSet<Account> Account { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

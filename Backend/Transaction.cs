@@ -5,25 +5,30 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 [PrimaryKey(nameof(Id))]
 public class Transaction
 {
-    [Required]
     public int Id { get; set; }
 
     [Required]
-    public string Description { get; set; }
+    [JsonPropertyName ("description")]
+    public required string Description { get; set; }
 
     [Required]
-    public DebitOrCredit DebitCredit { get; set; }
+    [JsonPropertyName("debit_credit")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public required DebitOrCredit DebitCredit { get; set; }
 
     [Required]
-    public decimal Amount { get; set; }
+    [JsonPropertyName("amount")]
+    public required decimal Amount { get; set; }
 
     [Required]
-    public int AccountId { get; set; }
+    [JsonPropertyName("account_id")]
+    public required int AccountId { get; set; }
 
     public enum DebitOrCredit
     {

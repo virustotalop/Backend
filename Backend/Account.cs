@@ -5,24 +5,28 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 [PrimaryKey(nameof(Id))]
 public class Account
 {
-    [Required]
     public int Id { get; set; }
 
     [Required]
-    public string Name { get; set; }
+    [JsonPropertyName("name")]
+    public required string Name { get; set; }
 
     [Required]
-    public string Number { get; set; }
+    [JsonPropertyName("number")]
+    public required string Number { get; set; }
 
     [Required]
-    public decimal CurrentBalance { get; set; }
+    [JsonPropertyName("current_balance")]
+    public required decimal CurrentBalance { get; set; }
 
     [Required]
-    public int OverdraftLimit { get; set; }
+    [JsonPropertyName("overdraft_limit")]
+    public required int OverdraftLimit { get; set; }
 
 }
