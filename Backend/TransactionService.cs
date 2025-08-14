@@ -61,7 +61,7 @@ public class TransactionService
 
     public async Task<List<Transaction>> GetTransactionsForAccountAsync(int accountId)
     {
-        var account = await _context.Account.FindAsync(accountId);
+        Account? account = await _context.Account.FindAsync(accountId);
         if (account == null)
         {
             throw new InvalidOperationException("Cannot get transactions for an account that does not exist");
