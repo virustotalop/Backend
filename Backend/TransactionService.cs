@@ -88,9 +88,10 @@ public class TransactionService
             throw new InvalidOperationException("Cannot create a transaction for an account that does not exist");
         }
 
+        //Flip the value to restore the original value
         //Credit = +200 -> flip * -200
         //Debit = -200 -> flip * 200 
-        account.CurrentBalance += GetDebitCreditAffectedAmount(transaction.DebitCredit, transaction.Amount) * -1; //Flip the value
+        account.CurrentBalance += GetDebitCreditAffectedAmount(transaction.DebitCredit, transaction.Amount) * -1;
         account.CurrentBalance += GetDebitCreditAffectedAmount(newDebitOrCredit, newAmount);
 
         transaction.Amount = newAmount;
@@ -120,7 +121,8 @@ public class TransactionService
             throw new InvalidOperationException("Cannot create a transaction for an account that does not exist");
         }
 
-        account.CurrentBalance += GetDebitCreditAffectedAmount(transaction.DebitCredit, transaction.Amount) * -1; //Flip value
+        //Flip the value to restore the original value
+        account.CurrentBalance += GetDebitCreditAffectedAmount(transaction.DebitCredit, transaction.Amount) * -1; 
 
         await _repo.DeleteAsync(transaction);
         await _repo.SaveChangesAsync();
