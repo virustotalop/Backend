@@ -13,6 +13,17 @@ class Program
         {
             context.Database.EnsureCreated();
             SeedDatabase(context);
+
+            WebApplicationBuilder builder = WebApplication.CreateBuilder();
+
+            builder.Services.AddSingleton(context);
+            builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+            builder.Services.AddScoped<TransactionService>();
+            builder.Services.AddControllers();
+
+            WebApplication app = builder.Build();
+            app.MapControllers();
+            app.Run();
         }
     }
 
