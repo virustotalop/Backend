@@ -2,7 +2,7 @@
 using System.Text.Json;
 
 
-class Program
+public class Program
 {
     private const string AccountJsonKey = "accounts";
     private const string TransactionJsonKey = "transactions";
@@ -11,6 +11,14 @@ class Program
     {
         using (BackendDbContext context = new BackendDbContext())
         {
+            WebApplication application = CreateWebApplication(context);
+            application.Run();
+        }
+    }
+
+    public static WebApplication CreateWebApplication(BackendDbContext context)
+    {
+       
             context.Database.EnsureCreated();
             SeedDatabase(context);
 
@@ -23,8 +31,8 @@ class Program
 
             WebApplication app = builder.Build();
             app.MapControllers();
-            app.Run();
-        }
+            return app;
+        
     }
 
     private static void SeedDatabase(BackendDbContext context)
