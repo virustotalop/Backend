@@ -1,4 +1,5 @@
 ﻿using EFModeling.EntityProperties.FluentAPI.Required;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using System.Text.Json;
 
 
@@ -18,7 +19,6 @@ public class Program
 
     public static WebApplication CreateWebApplication(BackendDbContext context)
     {
-       
             context.Database.EnsureCreated();
             SeedDatabase(context);
 
@@ -27,11 +27,17 @@ public class Program
             builder.Services.AddSingleton(context);
             builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
             builder.Services.AddScoped<TransactionService>();
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+            .PartManager.ApplicationParts.Add(new AssemblyPart(typeof(TransactionsController).Assembly));
 
             WebApplication app = builder.Build();
             app.MapControllers();
-            return app;
+        app.Use(async (context, next) =>
+        {
+            Console.WriteLine($"Incoming request: {context.Request.Method} {context.Request.Path}");
+            await next();
+        });
+        return app;
         
     }
 

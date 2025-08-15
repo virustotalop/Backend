@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/account/{accountid}/transaction")]
+[Route("api/account/{accountId}/transaction")]
 public class TransactionsController : ControllerBase
 {
     private readonly TransactionService _service;
@@ -28,7 +28,7 @@ public class TransactionsController : ControllerBase
         try
         {
             Transaction? transaction = await _service.CreateTransactionAsync(
-                request.AccountId, 
+                accountId,
                 request.Amount, 
                 request.DebitOrCredit, 
                 request.Description
@@ -81,6 +81,4 @@ public class TransactionRequest
     public required string DebitOrCredit { get; set; }
 
     public required string Description { get; set; }
-
-    public required int AccountId { get; set; }
 }

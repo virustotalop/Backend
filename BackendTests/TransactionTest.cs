@@ -5,10 +5,11 @@ using Microsoft.EntityFrameworkCore.Storage;
 [TestClass]
 public class TransactionsTest
 {
-
     private static BackendDbContext? _context;
     private static Task? _webAppTask;
     private static HttpClient? _client;
+
+    public TestContext? TestContext { get; set; }
 
     [ClassInitialize]
     public static void ClassInit(TestContext context)
@@ -22,46 +23,37 @@ public class TransactionsTest
     [TestMethod]
     public async Task GetTransactions()
     {
-        Transaction transaction = await _client.GetFromJsonAsync<Transaction>("/api/account/1/transaction");
-        Assert.IsNotNull(transaction);
+        List<Transaction> transactions = await _client.GetFromJsonAsync<List<Transaction>>("/api/account/1/transaction");
+        Assert.IsNotNull(transactions);
     }
 
     [TestMethod]
     public async Task CreateTransaction()
     {
-
-        using IDbContextTransaction dbTransaction = await _context.Database.BeginTransactionAsync();
-
-        Transaction request = new Transaction
+        TransactionRequest request = new TransactionRequest
         {
             Amount = 100,
-            DebitCredit = Transaction.DebitOrCredit.Credit,
+            DebitOrCredit = "credit",
             Description = "DB Test",
-            AccountId = 1
         };
 
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/account/1/transaction", request);
-        response.EnsureSuccessStatusCode();
+        var body = await response.Content.ReadAsStringAsync();
 
         Transaction? transaction = await response.Content.ReadFromJsonAsync<Transaction>();
-        Assert.Equals(100, transaction!.Amount);
-        Assert.Equals("DB Test", transaction.Description);
-
-        await dbTransaction.RollbackAsync();
+        Assert.IsNotNull(transaction);
+        Assert.AreEqual(100, transaction!.Amount);
+        Assert.AreEqual("DB Test", transaction.Description);
     }
 
     [TestMethod]
     public async Task DeleteTransaction()
     {
-
-        using IDbContextTransaction dbTransaction = await _context.Database.BeginTransactionAsync();
-
-        Transaction request = new Transaction
+        TransactionRequest request = new TransactionRequest
         {
             Amount = 100,
-            DebitCredit = Transaction.DebitOrCredit.Credit,
-            Description = "DB Test",
-            AccountId = 1
+            DebitOrCredit = "credit",
+            Description = "DB Test"
         };
 
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/account/1/transaction", request);
@@ -71,22 +63,16 @@ public class TransactionsTest
 
         HttpResponseMessage deleteResponse = await _client.DeleteAsync("/api/account/1/transaction/" + transaction.Id);
         deleteResponse.EnsureSuccessStatusCode();
-
-        await dbTransaction.RollbackAsync();
     }
 
     [TestMethod]
     public async Task UpdateTransaction()
     {
-
-        using IDbContextTransaction dbTransaction = await _context.Database.BeginTransactionAsync();
-
-        Transaction request = new Transaction
+        TransactionRequest request = new TransactionRequest
         {
             Amount = 100,
-            DebitCredit = Transaction.DebitOrCredit.Credit,
+            DebitOrCredit = "credit",
             Description = "DB Test",
-            AccountId = 1
         };
 
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/account/1/transaction", request);
@@ -94,17 +80,14 @@ public class TransactionsTest
 
         Transaction? transaction = await response.Content.ReadFromJsonAsync<Transaction>();
 
-        Transaction updatedRequest = new Transaction
+        TransactionRequest updatedRequest = new TransactionRequest
         {
             Amount = 200,
-            DebitCredit = Transaction.DebitOrCredit.Credit,
+            DebitOrCredit = "credit",
             Description = "DB Test",
-            AccountId = 1
         };
 
-        HttpResponseMessage deleteResponse = await _client.PutAsync("/api/account/1/transaction/" + transaction.Id, updatedRequest);
-        deleteResponse.EnsureSuccessStatusCode();
-
-        await dbTransaction.RollbackAsync();
+        HttpResponseMessage updateResponse = await _client.PutAsJsonAsync("/api/account/1/transaction/" + transaction.Id, updatedRequest);
+        updateResponse.EnsureSuccessStatusCode();
     }
 }
