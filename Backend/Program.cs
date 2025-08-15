@@ -33,6 +33,8 @@ public class Program
         .PartManager.ApplicationParts.Add(new AssemblyPart(typeof(TransactionsController).Assembly));
         builder.Services.AddControllers()
         .PartManager.ApplicationParts.Add(new AssemblyPart(typeof(AccountController).Assembly));
+        builder.Services.AddControllers()
+        .PartManager.ApplicationParts.Add(new AssemblyPart(typeof(ExportController).Assembly));
 
         WebApplication app = builder.Build();
         app.MapControllers();
