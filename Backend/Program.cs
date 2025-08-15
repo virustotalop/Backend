@@ -19,26 +19,20 @@ public class Program
 
     public static WebApplication CreateWebApplication(BackendDbContext context)
     {
-            context.Database.EnsureCreated();
-            SeedDatabase(context);
+         context.Database.EnsureCreated();
+        SeedDatabase(context);
 
-            WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
 
-            builder.Services.AddSingleton(context);
-            builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-            builder.Services.AddScoped<TransactionService>();
-            builder.Services.AddControllers()
-            .PartManager.ApplicationParts.Add(new AssemblyPart(typeof(TransactionsController).Assembly));
+        builder.Services.AddSingleton(context);
+        builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+        builder.Services.AddScoped<TransactionService>();
+        builder.Services.AddControllers()
+        .PartManager.ApplicationParts.Add(new AssemblyPart(typeof(TransactionsController).Assembly));
 
-            WebApplication app = builder.Build();
-            app.MapControllers();
-        app.Use(async (context, next) =>
-        {
-            Console.WriteLine($"Incoming request: {context.Request.Method} {context.Request.Path}");
-            await next();
-        });
-        return app;
-        
+        WebApplication app = builder.Build();
+        app.MapControllers();
+        return app; 
     }
 
     private static void SeedDatabase(BackendDbContext context)
