@@ -27,8 +27,12 @@ public class Program
         builder.Services.AddSingleton(context);
         builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
         builder.Services.AddScoped<TransactionService>();
+        builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+        builder.Services.AddScoped<AccountService>();
         builder.Services.AddControllers()
         .PartManager.ApplicationParts.Add(new AssemblyPart(typeof(TransactionsController).Assembly));
+        builder.Services.AddControllers()
+        .PartManager.ApplicationParts.Add(new AssemblyPart(typeof(AccountController).Assembly));
 
         WebApplication app = builder.Build();
         app.MapControllers();

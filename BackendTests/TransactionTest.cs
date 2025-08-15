@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using EFModeling.EntityProperties.FluentAPI.Required;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Net;
 
 [TestClass]
 public class TransactionsTest
@@ -47,6 +48,20 @@ public class TransactionsTest
     }
 
     [TestMethod]
+    public async Task CreateInvalidTransaction()
+    {
+        TransactionRequest request = new TransactionRequest
+        {
+            Amount = 100,
+            DebitOrCredit = "credit",
+            Description = "DB Test",
+        };
+
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/account/1000/transaction", request);
+        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [TestMethod]
     public async Task DeleteTransaction()
     {
         TransactionRequest request = new TransactionRequest
@@ -66,6 +81,13 @@ public class TransactionsTest
     }
 
     [TestMethod]
+    public async Task DeleteInvalidTransaction()
+    {
+        HttpResponseMessage deleteResponse = await _client.DeleteAsync("/api/account/1/transaction/" + 1000000);
+        Assert.AreEqual(HttpStatusCode.BadRequest, deleteResponse.StatusCode);
+    }
+
+    [TestMethod]
     public async Task UpdateTransaction()
     {
         TransactionRequest request = new TransactionRequest
@@ -78,6 +100,11 @@ public class TransactionsTest
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/account/1/transaction", request);
         response.EnsureSuccessStatusCode();
 
+        Account? oldAccount = await _client.GetFromJsonAsync<Account>("/api/account/1");
+        Assert.IsNotNull(oldAccount);
+
+        decimal oldBalance = oldAccount.CurrentBalance;
+
         Transaction? transaction = await response.Content.ReadFromJsonAsync<Transaction>();
 
         TransactionRequest updatedRequest = new TransactionRequest
@@ -89,5 +116,11 @@ public class TransactionsTest
 
         HttpResponseMessage updateResponse = await _client.PutAsJsonAsync("/api/account/1/transaction/" + transaction.Id, updatedRequest);
         updateResponse.EnsureSuccessStatusCode();
+
+        Account? newAccount = await _client.GetFromJsonAsync<Account>("/api/account/1");
+        Assert.IsNotNull(newAccount);
+
+        decimal newBalance = newAccount.CurrentBalance;
+        Assert.AreEqual(oldBalance + 100, newBalance);
     }
 }
